@@ -1,3 +1,5 @@
+patches-own [ capacity landed_num ]
+
 to setup
   clear-all
   create_map
@@ -25,23 +27,25 @@ end
 
 to place_planes
   let _assigned_planes airplane_num
-  let _plane_batch (airplane_num / airport_num)
+  let _plane_batch (ceiling (airplane_num / airport_num))
   let _planes 0
   ask patches with [pcolor = yellow] [
     ifelse _assigned_planes < _plane_batch [set _planes _assigned_planes] [set _planes _plane_batch]
     sprout _planes
+    set landed_num _planes
+    set capacity (_planes + 2)
     set _assigned_planes (_assigned_planes - _planes)
   ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-1086
+968
 10
 1572
-517
+635
 16
 16
-14.42424242424243
+18.0
 1
 10
 1
@@ -104,7 +108,7 @@ airport_num
 airport_num
 2
 20
-11
+8
 1
 1
 NIL
@@ -136,7 +140,7 @@ airplane_num
 airplane_num
 3
 50
-5
+7
 1
 1
 NIL
