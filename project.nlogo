@@ -1,5 +1,7 @@
-patches-own [ capacity landed_num ]
+patches-own [ capacity landed_num available_slots ]
+turtles-own [ landed destx desty ]
 
+;; Setups the map and the airplanes
 to setup
   clear-all
   create_map
@@ -7,35 +9,83 @@ to setup
   reset-ticks
 end
 
+;; Go
 to go
-  print "Hi"
+  find_destinations
+  move_planes
+  tick
 end
 
+;; Creates airports on the map
 to create_map
   let _airport_count 0
-  while [_airport_count < airport_num] [
-    ask patch random-pxcor random-pycor [
-      ;;let colors ([pcolor] of in-radius 2)
-      let colors ([pcolor] of (patches in-radius 3))
+  while [_airport_count < airport_num] [                    ;; While not all airports placed
+    ask patch random-pxcor random-pycor [                   ;; try to place airport in random spot
+      let colors ([pcolor] of (patches in-radius 3))        ;; Check if there are airports near the random spot
       if not member? 45 colors [
         set pcolor yellow
+        set plabel (word "Airport" _airport_count)
         set _airport_count (_airport_count + 1)
       ]
     ]
   ]
 end
 
+;; Assings planes to the airports
 to place_planes
   let _assigned_planes airplane_num
   let _plane_batch (ceiling (airplane_num / airport_num))
   let _planes 0
+
   ask patches with [pcolor = yellow] [
     ifelse _assigned_planes < _plane_batch [set _planes _assigned_planes] [set _planes _plane_batch]
     sprout _planes
     set landed_num _planes
     set capacity (_planes + 2)
     set _assigned_planes (_assigned_planes - _planes)
+    set available_slots (capacity - _assigned_planes)
   ]
+
+  ask turtles [
+    set landed true
+  ]
+end
+
+;; Finds destinations for each airplane
+to find_destinations
+  ask turtles with [landed = true][                     ;; Ask all landed airplanes
+
+    ;; Only try to find a destination with probability 25%
+    let _chance (random 4)
+    if (_chance = 0) [ stop ]
+
+    ;; Get random airport
+    let possible_dest ([plabel] of (patches with [pcolor = yellow]))
+    set _chance (random (length possible_dest))
+    let _possible_airport (patches with [plabel = (item _chance possible_dest)])
+
+    ;; Check if random airport has available slots
+    let _avail (item 0 ([available_slots] of _possible_airport))
+    if  _avail > 0 [
+      ;; Check if turtle already not on airport
+      let _possx (item 0 ([pxcor] of _possible_airport))
+      let _possy (item 0 ([pycor] of _possible_airport))
+      if _possx = xcor and _possy = ycor [stop]
+
+      ;; Set destination
+      set destx _possx
+      set desty _possy
+      set landed false
+
+      ;; Reserve spot in airport
+      ask _possible_airport [
+        set available_slots (available_slots - 1)
+      ]
+    ]
+  ]
+end
+
+to move_planes
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
