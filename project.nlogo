@@ -1,5 +1,5 @@
 patches-own [ capacity landed_num available_slots ]
-turtles-own [ landed destx desty ]
+turtles-own [ landed? destx desty ]
 
 ;; Setups the map and the airplanes
 to setup
@@ -47,13 +47,13 @@ to place_planes
   ]
 
   ask turtles [
-    set landed true
+    set landed? true
   ]
 end
 
 ;; Finds destinations for each airplane
 to find_destinations
-  ask turtles with [landed = true][                     ;; Ask all landed airplanes
+  ask turtles with [landed?][                     ;; Ask all landed airplanes
 
     ;; Only try to find a destination with probability 25%
     let _chance (random 4)
@@ -75,7 +75,7 @@ to find_destinations
       ;; Set destination
       set destx _possx
       set desty _possy
-      set landed false
+      set landed? false
 
       ;; Reserve spot in airport
       ask _possible_airport [
