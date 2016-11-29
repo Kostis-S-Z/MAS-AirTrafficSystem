@@ -57,28 +57,26 @@ to find_destinations
 
     ;; Only try to find a destination with probability 25%
     let _chance (random 4)
-    if (_chance = 0) [ stop ]
+    if (_chance != 0) [ stop ]
 
     ;; Get random airport
-    let _possible_dest ([plabel] of (patches with [pcolor = yellow]))
-    set _chance (random (length _possible_dest))
-    let _possible_airport (one-of patches with [plabel = (item _chance _possible_dest)])
+    let _curr_airport (patch-at 0 0)
+    let _possible_destinations (patches with [pcolor = yellow and self != _curr_airport])
+    let _destination (one-of _possible_destinations)
 
     ;; Check if random airport has available slots
-    if  ([available_slots] of _possible_airport) > 0 [
-      ;; Check if turtle already not on airport
-      let _possx ([pxcor] of _possible_airport)
-      let _possy ([pycor] of _possible_airport)
-      if _possx = xcor and _possy = ycor [stop]
+    if  ([available_slots] of _destination) > 0 [
+      let _possx ([pxcor] of _destination)
+      let _possy ([pycor] of _destination)
 
       ;; Set destination
       set destx _possx
       set desty _possy
       set landed? false
 
-      set fuel ((distance _possible_airport) + fuel_redundancy)
+      set fuel ((distance _destination) + fuel_redundancy)
       ;; Reserve spot in airport
-      ask _possible_airport [
+      ask _destination [
         set available_slots (available_slots - 1)
       ]
     ]
