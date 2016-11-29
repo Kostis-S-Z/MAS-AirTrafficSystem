@@ -1,7 +1,9 @@
 patches-own [ capacity landed_num available_slots ]
 turtles-own [ landed? destx desty fuel ]
 
+;;
 ;; Setups the map and the airplanes
+;;
 to setup
   clear-all
   create_map
@@ -9,7 +11,9 @@ to setup
   reset-ticks
 end
 
+;;
 ;; Go
+;;
 to go
   find_destinations
   move_planes
@@ -31,7 +35,9 @@ to create_map
   ]
 end
 
+;;
 ;; Assings planes to the airports
+;;
 to place_planes
   let _assigned_planes airplane_num
   let _plane_batch (ceiling (airplane_num / airport_num))
@@ -51,7 +57,9 @@ to place_planes
   ]
 end
 
+;;
 ;; Finds destinations for each airplane
+;;
 to find_destinations
   ask turtles with [landed?][                     ;; Ask all landed airplanes
 
