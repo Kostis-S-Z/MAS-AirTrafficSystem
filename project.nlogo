@@ -1,5 +1,5 @@
 patches-own [ capacity landed_num available_slots ]
-turtles-own [ landed? destx desty ]
+turtles-own [ landed? destx desty fuel ]
 
 ;; Setups the map and the airplanes
 to setup
@@ -60,16 +60,15 @@ to find_destinations
     if (_chance = 0) [ stop ]
 
     ;; Get random airport
-    let possible_dest ([plabel] of (patches with [pcolor = yellow]))
-    set _chance (random (length possible_dest))
-    let _possible_airport (patches with [plabel = (item _chance possible_dest)])
+    let _possible_dest ([plabel] of (patches with [pcolor = yellow]))
+    set _chance (random (length _possible_dest))
+    let _possible_airport (one-of patches with [plabel = (item _chance _possible_dest)])
 
     ;; Check if random airport has available slots
-    let _avail (item 0 ([available_slots] of _possible_airport))
-    if  _avail > 0 [
+    if  ([available_slots] of _possible_airport) > 0 [
       ;; Check if turtle already not on airport
-      let _possx (item 0 ([pxcor] of _possible_airport))
-      let _possy (item 0 ([pycor] of _possible_airport))
+      let _possx ([pxcor] of _possible_airport)
+      let _possy ([pycor] of _possible_airport)
       if _possx = xcor and _possy = ycor [stop]
 
       ;; Set destination
@@ -77,6 +76,7 @@ to find_destinations
       set desty _possy
       set landed? false
 
+      set fuel ((distance _possible_airport) + fuel_redundancy)
       ;; Reserve spot in airport
       ask _possible_airport [
         set available_slots (available_slots - 1)
@@ -194,6 +194,21 @@ airplane_num
 1
 1
 NIL
+HORIZONTAL
+
+SLIDER
+12
+157
+241
+190
+fuel_redundancy
+fuel_redundancy
+0
+20
+5
+1
+1
+patches
 HORIZONTAL
 
 @#$#@#$#@
