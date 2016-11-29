@@ -49,7 +49,7 @@ to place_planes
     set landed_num _planes
     set capacity (_planes + 2)
     set _assigned_planes (_assigned_planes - _planes)
-    set available_slots (capacity - _assigned_planes)
+    set available_slots (capacity - landed_num)
   ]
 
   ask turtles [
@@ -84,8 +84,11 @@ to find_destinations
 
       set fuel ((distance _destination) + fuel_redundancy)
       ;; Reserve spot in airport
-      ask _destination [
-        set available_slots (available_slots - 1)
+      ask _destination [ set available_slots (available_slots - 1)]
+
+      ask _curr_airport [
+        set available_slots (available_slots + 1)
+        set landed_num (landed_num - 1)
       ]
     ]
   ]
