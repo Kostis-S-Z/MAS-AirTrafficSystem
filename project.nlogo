@@ -25,8 +25,8 @@ to create_map
   let _airport_count 0
   while [_airport_count < airport_num] [                    ;; While not all airports placed
     ask patch random-pxcor random-pycor [                   ;; try to place airport in random spot
-      let colors ([pcolor] of (patches in-radius 3))        ;; Check if there are airports near the random spot
-      if not member? 45 colors [
+      let _colors ([pcolor] of (patches in-radius 3))        ;; Check if there are airports near the random spot
+      if not member? 45 _colors [
         set pcolor yellow
         set plabel (word "Airport" _airport_count)
         set _airport_count (_airport_count + 1)
@@ -63,8 +63,8 @@ end
 to find_destinations
   ask turtles with [landed?][                     ;; Ask all landed airplanes
 
-    ;; Only try to find a destination with probability 25%
-    let _chance (random 4)
+    ;; Only try to find a destination with probability
+    let _chance (random 100)
     if (_chance != 0) [ stop ]
 
     ;; Get random airport
@@ -98,10 +98,8 @@ end
 to move_planes
   ask turtles with [not landed?][
     ;; Move forward and lose fuel
-    let dist1 (distance dest)
     forward 0.0001
-    let dist2 (distance dest)
-    set fuel (fuel - (abs (dist1 - dist2)))
+    set fuel (fuel - 0.0001)
 
     ;; For those that arrived
     if member? self (turtles-on dest) [
@@ -235,7 +233,7 @@ fuel_redundancy
 5
 1
 1
-patches
+NIL
 HORIZONTAL
 
 @#$#@#$#@
