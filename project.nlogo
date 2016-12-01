@@ -98,8 +98,8 @@ end
 to move_planes
   ask turtles with [not landed?][
     ;; Move forward and lose fuel
-    forward 0.0001
-    set fuel (fuel - 0.0001)
+    forward airplane_speed
+    set fuel (fuel - airplane_speed)
 
     ;; For those that arrived
     if member? self (turtles-on dest) [
@@ -114,13 +114,13 @@ to move_planes
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-968
-10
-1572
-635
+483
+12
+928
+478
 16
 16
-18.0
+13.2
 1
 10
 1
@@ -183,7 +183,7 @@ airport_num
 airport_num
 2
 20
-8
+12
 1
 1
 NIL
@@ -215,7 +215,7 @@ airplane_num
 airplane_num
 3
 50
-7
+21
 1
 1
 NIL
@@ -232,6 +232,21 @@ fuel_redundancy
 20
 5
 1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+11
+207
+302
+240
+airplane_speed
+airplane_speed
+0.0001
+0.01
+0.0019
+0.0001
 1
 NIL
 HORIZONTAL
