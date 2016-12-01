@@ -107,6 +107,7 @@ to move_planes
     if member? self (turtles-on dest) [
       forward 0.6
       set landed? true
+      set fuel 0
       ask dest [
         set landed_num (landed_num + 1)
       ]
