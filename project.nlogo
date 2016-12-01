@@ -1,5 +1,5 @@
 patches-own [ capacity landed_num available_slots ]
-turtles-own [ landed? destx desty fuel ]
+turtles-own [ landed? dest fuel ]
 
 ;;
 ;; Setups the map and the airplanes
@@ -74,13 +74,11 @@ to find_destinations
 
     ;; Check if random airport has available slots
     if  ([available_slots] of _destination) > 0 [
-      let _possx ([pxcor] of _destination)
-      let _possy ([pycor] of _destination)
 
       ;; Set destination
-      set destx _possx
-      set desty _possy
+      set dest _destination
       set landed? false
+      face _destination
 
       set fuel ((distance _destination) + fuel_redundancy)
       ;; Reserve spot in airport
@@ -94,7 +92,26 @@ to find_destinations
   ]
 end
 
+;;
+;; Moves turtles towards their destination
+;;
 to move_planes
+  ask turtles with [not landed?][
+    ;; Move forward and lose fuel
+    let dist1 (distance dest)
+    forward 0.0001
+    let dist2 (distance dest)
+    set fuel (fuel - (abs (dist1 - dist2)))
+
+    ;; For those that arrived
+    if member? self (turtles-on dest) [
+      forward 0.6
+      set landed? true
+      ask dest [
+        set landed_num (landed_num + 1)
+      ]
+    ]
+  ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
