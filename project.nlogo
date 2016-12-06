@@ -1,6 +1,6 @@
 patches-own [ capacity landed_num available_slots destroyed? ]
-turtles-own [ landed? dest fuel ]
-
+turtles-own [ landed? dest fuel dest_destroyed?]
+extensions [ table ]
 ;;
 ;; Setups the map and the airplanes
 ;;
@@ -86,6 +86,7 @@ to place_planes
 
   ask turtles [
     set landed? true
+    set dest_destroyed? false
   ]
 end
 
@@ -124,11 +125,63 @@ to find_destinations
   ]
 end
 
+to on_the_fly_dest
+  ask self [
+    ;; Get random airport
+    let _possible_destinations (patches with [ destroyed? = false ])
+    let _destination (one-of _possible_destinations)
+
+    ;;make a dictionary of distances and airports
+    let _var1 pxcor
+    let _var2 pycor
+    let _dict table:make
+    ask _possible_destinations [
+      let _dist (abs(pxcor - _var1) + abs(pycor - _var2))
+      table:put _dict _dist self
+    ]
+    ;; sort based on distance
+    show _dict
+    let _keyset table:keys _dict
+    let _sortedlist sort  _keyset
+
+    let _boolean? false
+    foreach _sortedlist [
+      let _airport table:get _dict ?
+      if not _boolean? [
+        ask _airport [
+          if ([available_slots] of _airport) > 0 [
+            set available_slots (available_slots - 1)
+            set dest self
+            set _boolean? true
+          ]
+        ]
+      ]
+      ;; remove element from list
+      if not _boolean? [
+        set _keyset remove-item 0 _keyset
+      ]
+    ]
+    face dest
+  ]
+end
+
 ;;
 ;; Moves turtles towards their destination
 ;;
 to move_planes
   ask turtles with [not landed?][
+    let _boolean? false
+    ;; check if dest is destroyed
+    ask dest [
+      if destroyed? [
+        set _boolean? true
+      ]
+    ]
+    if _boolean? [
+      set dest_destroyed? true
+      on_the_fly_dest
+    ]
+
     ;; Move forward and lose fuel
     forward airplane_speed
     set fuel (fuel - airplane_speed)
