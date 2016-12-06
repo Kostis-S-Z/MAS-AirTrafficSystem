@@ -15,6 +15,7 @@ end
 ;; Go
 ;;
 to go
+  ;;airport_crush
   find_destinations
   move_planes
   tick
@@ -28,12 +29,18 @@ to create_map
       let _colors ([pcolor] of (patches in-radius 3))        ;; Check if there are airports near the random spot
       if not member? 45 _colors [
         set pcolor yellow
-        set plabel (word "Airport" _airport_count)
+        ;;set plabel (word "Airport" _airport_count)
         set _airport_count (_airport_count + 1)
       ]
     ]
   ]
 end
+
+;;to airport_crush
+;;  let airport_count 0
+;;  while[_airport_count < airport_num][
+
+ ;;   ]
 
 ;;
 ;; Assings planes to the airports
@@ -183,7 +190,7 @@ airport_num
 airport_num
 2
 20
-12
+3
 1
 1
 NIL
@@ -215,7 +222,7 @@ airplane_num
 airplane_num
 3
 50
-21
+3
 1
 1
 NIL
@@ -230,7 +237,7 @@ fuel_redundancy
 fuel_redundancy
 0
 20
-5
+6
 1
 1
 NIL
@@ -245,8 +252,34 @@ airplane_speed
 airplane_speed
 0.0001
 0.01
-0.0019
+9.0E-4
 0.0001
+1
+NIL
+HORIZONTAL
+
+SWITCH
+12
+257
+164
+290
+airport_crush
+airport_crush
+1
+1
+-1000
+
+SLIDER
+181
+258
+412
+291
+airport_crush_frequency
+airport_crush_frequency
+0.01
+1
+0.05
+0.01
 1
 NIL
 HORIZONTAL
