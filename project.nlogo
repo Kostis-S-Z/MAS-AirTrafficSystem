@@ -1,4 +1,4 @@
-patches-own [ capacity landed_num available_slots ]
+patches-own [ capacity landed_num available_slots destroyed? ]
 turtles-own [ landed? dest fuel ]
 
 ;;
@@ -15,7 +15,8 @@ end
 ;; Go
 ;;
 to go
-  ;;airport_crush
+  mouse-manager
+  airport_destroyed
   find_destinations
   move_planes
   tick
@@ -29,6 +30,7 @@ to create_map
       let _colors ([pcolor] of (patches in-radius 3))        ;; Check if there are airports near the random spot
       if not member? 45 _colors [
         set pcolor yellow
+        set destroyed? false
         ;;set plabel (word "Airport" _airport_count)
         set _airport_count (_airport_count + 1)
       ]
@@ -36,11 +38,34 @@ to create_map
   ]
 end
 
-;;to airport_crush
-;;  let airport_count 0
-;;  while[_airport_count < airport_num][
+to airport_destroyed
+  if mouse-clicked? [
+    ask patch mouse-xcor mouse-ycor [
+      ifelse pcolor = yellow
+      [
+        set pcolor red
+        set destroyed? true
+      ]
+      [
+        if pcolor = red[
+        set pcolor yellow
+        set destroyed? false
+        ]
+      ]
+    ]
+  ]
+end
 
- ;;   ]
+globals [ mouse-was-down? ]
+
+to-report mouse-clicked?
+  report (mouse-was-down? = true and not mouse-down?)
+end
+
+to mouse-manager
+  let mouse-is-down? mouse-down?
+  set mouse-was-down? mouse-is-down?
+end
 
 ;;
 ;; Assings planes to the airports
@@ -76,7 +101,7 @@ to find_destinations
 
     ;; Get random airport
     let _curr_airport (patch-at 0 0)
-    let _possible_destinations (patches with [pcolor = yellow and self != _curr_airport])
+    let _possible_destinations (patches with [ destroyed? = false and self != _curr_airport])
     let _destination (one-of _possible_destinations)
 
     ;; Check if random airport has available slots
@@ -252,34 +277,8 @@ airplane_speed
 airplane_speed
 0.0001
 0.01
-9.0E-4
+6.0E-4
 0.0001
-1
-NIL
-HORIZONTAL
-
-SWITCH
-12
-257
-164
-290
-airport_crush
-airport_crush
-1
-1
--1000
-
-SLIDER
-181
-258
-412
-291
-airport_crush_frequency
-airport_crush_frequency
-0.01
-1
-0.05
-0.01
 1
 NIL
 HORIZONTAL
