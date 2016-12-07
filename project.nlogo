@@ -1,6 +1,6 @@
-patches-own [ capacity landed_num available_slots destroyed? ]
+patches-own [ capacity landed_num available_slots destroyed? isairport? ]
 turtles-own [ landed? dest fuel dest_destroyed? ]
-globals [ mouse-was-down? crashed_planes ]
+globals [ mouse-was-down? crashed_planes extra_fuel ]
 
 ;;
 ;; Setups the map and the airplanes
@@ -14,6 +14,7 @@ to setup
 end
 
 to reset
+  reset_map
   clear-turtles
   clear-all-plots
   place_planes
@@ -38,14 +39,22 @@ to create_map
   let _airport_count 0
   while [_airport_count < airport_num] [                    ;; While not all airports placed
     ask patch random-pxcor random-pycor [                   ;; try to place airport in random spot
-      let _colors ([pcolor] of (patches in-radius 3))        ;; Check if there are airports near the random spot
-      if not member? 45 _colors [
+      let _np ([isairport?] of (patches in-radius 3))        ;; Check if there are airports near the random spot
+      if not member? true _np [
+        set isairport? true
         set pcolor yellow
         set destroyed? false
         set plabel (word "Airport" _airport_count)
         set _airport_count (_airport_count + 1)
       ]
     ]
+  ]
+end
+
+to reset_map
+  ask patches with [isairport? = true] [
+    set pcolor yellow
+    set destroyed? false
   ]
 end
 
@@ -96,7 +105,7 @@ to place_planes
   let _plane_batch (ceiling (airplane_num / airport_num))
   let _planes 0
 
-  ask patches with [pcolor = yellow] [
+  ask patches with [isairport? = true] [
     ifelse _assigned_planes < _plane_batch [set _planes _assigned_planes] [set _planes _plane_batch]
     sprout _planes
     set landed_num _planes
@@ -203,6 +212,9 @@ to move_planes
 
     forward airplane_speed
     set fuel (fuel - airplane_speed)
+    if fuel < fuel_redundancy [
+      set extra_fuel (extra_fuel + airplane_speed)
+    ]
 
     if fuel <= 0 [
       set crashed_planes (crashed_planes + 1)
@@ -225,10 +237,10 @@ to move_planes
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-419
-27
-864
-493
+761
+29
+1206
+495
 16
 16
 13.2
@@ -294,7 +306,7 @@ airport_num
 airport_num
 2
 20
-7
+20
 1
 1
 NIL
@@ -326,7 +338,7 @@ airplane_num
 airplane_num
 3
 50
-31
+50
 1
 1
 NIL
@@ -341,7 +353,7 @@ fuel_redundancy
 fuel_redundancy
 0
 100
-99
+12
 1
 1
 NIL
@@ -356,7 +368,7 @@ airplane_speed
 airplane_speed
 0.0001
 0.01
-0.0016
+0.01
 0.0001
 1
 NIL
@@ -365,8 +377,8 @@ HORIZONTAL
 PLOT
 13
 260
-387
-506
+392
+544
 Planes
 Time
 Planes
@@ -396,6 +408,24 @@ NIL
 NIL
 NIL
 1
+
+PLOT
+398
+261
+754
+547
+Extra fuel consumed
+Time
+Fuel Units
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot extra_fuel"
 
 @#$#@#$#@
 ## WHAT IS IT?
