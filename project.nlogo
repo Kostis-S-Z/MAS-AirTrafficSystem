@@ -1,6 +1,6 @@
 patches-own [ capacity landed_num available_slots destroyed? ]
-turtles-own [ landed? dest fuel dest_destroyed?]
-globals [ mouse-was-down? ]
+turtles-own [ landed? dest fuel dest_destroyed? ]
+globals [ mouse-was-down? crashed_planes ]
 
 ;;
 ;; Setups the map and the airplanes
@@ -10,6 +10,7 @@ to setup
   create_map
   place_planes
   reset-ticks
+  set crashed_planes 0
 end
 
 ;;
@@ -146,20 +147,31 @@ to on_the_fly_dest
   ask self [
     ;; Get random airport
     let _possible_destinations (patches with [ destroyed? = false and available_slots > 0 ])
+    if not any? _possible_destinations [stop]
 
-    if any? _possible_destinations [
-      let _airport (one-of _possible_destinations)
-      set dest _airport
-      set dest_destroyed? false
+    let _current_dist 0
+    let _airport nobody
+    let _min_dist 10000
+    let _dest_list []
+    ask _possible_destinations [set _dest_list lput self _dest_list]
 
-      ask dest [
-        set available_slots (available_slots - 1)
+    foreach _dest_list [
+      set _current_dist (distance ?)
+      if _current_dist < _min_dist [
+        set _min_dist _current_dist
+        set _airport ?
       ]
+    ]
+    set dest _airport
+    set dest_destroyed? false
 
-      face dest
+    ask dest [
+      set available_slots (available_slots - 1)
     ]
 
+    face dest
   ]
+
 end
 
 ;;
@@ -173,13 +185,22 @@ to move_planes
       on_the_fly_dest
     ]
 
-    if dest_destroyed? [
+    ifelse dest_destroyed? [
       facexy random-pxcor random-pycor
+    ] [
+      face dest
     ]
 
     ;; Move forward and lose fuel
+
     forward airplane_speed
     set fuel (fuel - airplane_speed)
+
+    if fuel <= 0 [
+      set crashed_planes (crashed_planes + 1)
+      die
+      stop
+    ]
 
     ;; For those that arrived
     if not dest_destroyed? [
@@ -265,7 +286,7 @@ airport_num
 airport_num
 2
 20
-8
+7
 1
 1
 NIL
@@ -297,7 +318,7 @@ airplane_num
 airplane_num
 3
 50
-23
+31
 1
 1
 NIL
@@ -311,8 +332,8 @@ SLIDER
 fuel_redundancy
 fuel_redundancy
 0
-20
-6
+100
+99
 1
 1
 NIL
@@ -327,7 +348,7 @@ airplane_speed
 airplane_speed
 0.0001
 0.01
-0.0011
+0.0016
 0.0001
 1
 NIL
