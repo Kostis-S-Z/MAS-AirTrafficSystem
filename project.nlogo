@@ -16,9 +16,8 @@ end
 ;;
 to go
   mouse-manager
-  airport_destroyed
-  find_destinations
   move_planes
+  find_destinations
   tick
 end
 
@@ -31,7 +30,7 @@ to create_map
       if not member? 45 _colors [
         set pcolor yellow
         set destroyed? false
-        ;;set plabel (word "Airport" _airport_count)
+        set plabel (word "Airport" _airport_count)
         set _airport_count (_airport_count + 1)
       ]
     ]
@@ -39,18 +38,17 @@ to create_map
 end
 
 to airport_destroyed
-  if mouse-clicked? [
-    ask patch mouse-xcor mouse-ycor [
-      ifelse pcolor = yellow
-      [
-        set pcolor red
-        set destroyed? true
-      ]
-      [
-        if pcolor = red[
-        set pcolor yellow
-        set destroyed? false
-        ]
+  ask patch mouse-xcor mouse-ycor [
+    ifelse pcolor = yellow
+    [
+      set pcolor red
+      set destroyed? true
+    ]
+    [
+      if pcolor = red[
+      set pcolor yellow
+      set destroyed? false
+      set available_slots (capacity - landed_num)
       ]
     ]
   ]
@@ -64,6 +62,10 @@ end
 
 to mouse-manager
   let mouse-is-down? mouse-down?
+
+  if mouse-clicked? [
+    airport_destroyed
+  ]
   set mouse-was-down? mouse-is-down?
 end
 
@@ -103,6 +105,8 @@ to find_destinations
     ;; Get random airport
     let _curr_airport (patch-at 0 0)
     let _possible_destinations (patches with [ destroyed? = false and self != _curr_airport])
+    if not any? _possible_destinations [stop]
+
     let _destination (one-of _possible_destinations)
 
     ;; Check if random airport has available slots
@@ -128,40 +132,20 @@ end
 to on_the_fly_dest
   ask self [
     ;; Get random airport
-    let _possible_destinations (patches with [ destroyed? = false ])
-    let _destination (one-of _possible_destinations)
+    let _possible_destinations (patches with [ destroyed? = false and available_slots > 0 ])
 
-    ;;make a dictionary of distances and airports
-    let _var1 pxcor
-    let _var2 pycor
-    let _dict table:make
-    ask _possible_destinations [
-      let _dist (abs(pxcor - _var1) + abs(pycor - _var2))
-      table:put _dict _dist self
-    ]
-    ;; sort based on distance
-    show _dict
-    let _keyset table:keys _dict
-    let _sortedlist sort  _keyset
+    if any? _possible_destinations [
+      let _airport (one-of _possible_destinations)
+      set dest _airport
+      set dest_destroyed? false
 
-    let _boolean? false
-    foreach _sortedlist [
-      let _airport table:get _dict ?
-      if not _boolean? [
-        ask _airport [
-          if ([available_slots] of _airport) > 0 [
-            set available_slots (available_slots - 1)
-            set dest self
-            set _boolean? true
-          ]
-        ]
+      ask dest [
+        set available_slots (available_slots - 1)
       ]
-      ;; remove element from list
-      if not _boolean? [
-        set _keyset remove-item 0 _keyset
-      ]
+
+      face dest
     ]
-    face dest
+
   ]
 end
 
@@ -170,16 +154,14 @@ end
 ;;
 to move_planes
   ask turtles with [not landed?][
-    let _boolean? false
     ;; check if dest is destroyed
-    ask dest [
-      if destroyed? [
-        set _boolean? true
-      ]
-    ]
-    if _boolean? [
-      set dest_destroyed? true
+    set dest_destroyed? ([destroyed?] of dest)
+    if dest_destroyed? [
       on_the_fly_dest
+    ]
+
+    if dest_destroyed? [
+      facexy random-pxcor random-pycor
     ]
 
     ;; Move forward and lose fuel
@@ -187,15 +169,17 @@ to move_planes
     set fuel (fuel - airplane_speed)
 
     ;; For those that arrived
-    if member? self (turtles-on dest) [
-      forward 0.6
-      set landed? true
-      set fuel 0
-      ask dest [
-        set landed_num (landed_num + 1)
+    if not dest_destroyed? [
+      if member? self (turtles-on dest) [
+        forward 0.6
+        set landed? true
+        set fuel 0
+        ask dest [
+          set landed_num (landed_num + 1)
+        ]
       ]
     ]
-  ]
+    ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -268,7 +252,7 @@ airport_num
 airport_num
 2
 20
-3
+8
 1
 1
 NIL
@@ -300,7 +284,7 @@ airplane_num
 airplane_num
 3
 50
-3
+23
 1
 1
 NIL
@@ -330,7 +314,7 @@ airplane_speed
 airplane_speed
 0.0001
 0.01
-6.0E-4
+0.0011
 0.0001
 1
 NIL
