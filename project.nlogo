@@ -13,6 +13,14 @@ to setup
   set crashed_planes 0
 end
 
+to reset
+  clear-turtles
+  clear-all-plots
+  place_planes
+  reset-ticks
+  set crashed_planes 0
+end
+
 ;;
 ;; Go
 ;;
@@ -217,10 +225,10 @@ to move_planes
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-483
-12
-928
-478
+419
+27
+864
+493
 16
 16
 13.2
@@ -261,10 +269,10 @@ NIL
 1
 
 BUTTON
-95
-17
-158
-50
+165
+19
+228
+52
 go
 go
 T
@@ -293,10 +301,10 @@ NIL
 HORIZONTAL
 
 BUTTON
-174
-17
-264
-50
+244
+19
+334
+52
 go once
 go
 NIL
@@ -359,9 +367,9 @@ PLOT
 260
 387
 506
-plot 1
-NIL
-NIL
+Planes
+Time
+Planes
 0.0
 10.0
 0.0
@@ -371,6 +379,23 @@ false
 "" ""
 PENS
 "default" 1.0 0 -16777216 true "" "plot count turtles"
+
+BUTTON
+89
+18
+159
+51
+reset
+reset
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
