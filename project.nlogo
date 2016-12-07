@@ -1,6 +1,7 @@
 patches-own [ capacity landed_num available_slots destroyed? ]
 turtles-own [ landed? dest fuel dest_destroyed?]
-extensions [ table ]
+globals [ mouse-was-down? ]
+
 ;;
 ;; Setups the map and the airplanes
 ;;
@@ -21,7 +22,9 @@ to go
   tick
 end
 
+;;
 ;; Creates airports on the map
+;;
 to create_map
   let _airport_count 0
   while [_airport_count < airport_num] [                    ;; While not all airports placed
@@ -37,6 +40,9 @@ to create_map
   ]
 end
 
+;;
+;; Destroys the clicked airport
+;;
 to airport_destroyed
   ask patch mouse-xcor mouse-ycor [
     ifelse pcolor = yellow
@@ -54,12 +60,16 @@ to airport_destroyed
   ]
 end
 
-globals [ mouse-was-down? ]
-
+;;
+;; Mouse click event
+;;
 to-report mouse-clicked?
   report (mouse-was-down? = true and not mouse-down?)
 end
 
+;;
+;; Handles mouse clicks
+;;
 to mouse-manager
   let mouse-is-down? mouse-down?
 
@@ -129,6 +139,9 @@ to find_destinations
   ]
 end
 
+;;
+;; Finds a destination for a plane on the fly
+;;
 to on_the_fly_dest
   ask self [
     ;; Get random airport
