@@ -1,6 +1,6 @@
 patches-own [ capacity landed_num available_slots destroyed? isairport? ]
 turtles-own [ landed? dest fuel dest_destroyed? ]
-globals [ mouse-was-down? crashed_planes extra_fuel ]
+globals [ mouse-was-down? crashed_planes extra_fuel redirects_num ]
 
 ;;
 ;; Setups the map and the airplanes
@@ -11,6 +11,7 @@ to setup
   place_planes
   reset-ticks
   set crashed_planes 0
+  set redirects_num 0
 end
 
 to reset
@@ -20,6 +21,7 @@ to reset
   place_planes
   reset-ticks
   set crashed_planes 0
+  set redirects_num 0
 end
 
 ;;
@@ -181,6 +183,7 @@ to on_the_fly_dest
     ]
     set dest _airport
     set dest_destroyed? false
+    set redirects_num (redirects_num + 1)
 
     ask dest [
       set available_slots (available_slots - 1)
@@ -306,7 +309,7 @@ airport_num
 airport_num
 2
 20
-20
+8
 1
 1
 NIL
@@ -338,7 +341,7 @@ airplane_num
 airplane_num
 3
 50
-50
+16
 1
 1
 NIL
@@ -368,7 +371,7 @@ airplane_speed
 airplane_speed
 0.0001
 0.01
-0.01
+0.003
 0.0001
 1
 NIL
@@ -426,6 +429,24 @@ false
 "" ""
 PENS
 "default" 1.0 0 -16777216 true "" "plot extra_fuel"
+
+PLOT
+406
+71
+606
+221
+Redirects
+Time
+Number of redirects
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot redirects_num"
 
 @#$#@#$#@
 ## WHAT IS IT?
