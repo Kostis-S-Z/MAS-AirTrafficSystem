@@ -12,6 +12,7 @@ to setup
   reset-ticks
   set crashed_planes 0
   set redirects_num 0
+  set extra_fuel 0
 end
 
 to reset
@@ -22,6 +23,7 @@ to reset
   reset-ticks
   set crashed_planes 0
   set redirects_num 0
+  set extra_fuel 0
 end
 
 ;;
@@ -159,6 +161,31 @@ to find_destinations
   ]
 end
 
+to negotiate_dest
+  let _dest_list []
+  let _possible_destinations (patches with [destroyed? = false])
+  let _current_dist 0
+  let _airport nobody
+  let _min_dist 10000
+  ask _possible_destinations [set _dest_list lput self _dest_list]
+
+  foreach _dest_list [
+    set _current_dist (distance ?)
+    if _current_dist < _min_dist [
+      set _min_dist _current_dist
+      set _airport ?
+    ]
+  ]
+
+  set dest _airport
+  set dest_destroyed? false
+  set redirects_num (redirects_num + 1)
+
+  ask one-of turtles with [dest = _airport][
+    set dest_destroyed? true
+  ]
+  face dest
+end
 ;;
 ;; Finds a destination for a plane on the fly
 ;;
@@ -166,7 +193,11 @@ to on_the_fly_dest
   ask self [
     ;; Get random airport
     let _possible_destinations (patches with [ destroyed? = false and available_slots > 0 ])
-    if not any? _possible_destinations [stop]
+    if not any? _possible_destinations  [
+      if not tactical [stop]
+      negotiate_dest
+      stop
+    ]
 
     let _current_dist 0
     let _airport nobody
@@ -447,6 +478,17 @@ false
 "" ""
 PENS
 "default" 1.0 0 -16777216 true "" "plot redirects_num"
+
+SWITCH
+218
+84
+388
+117
+tactical
+tactical
+0
+1
+-1000
 
 @#$#@#$#@
 ## WHAT IS IT?
