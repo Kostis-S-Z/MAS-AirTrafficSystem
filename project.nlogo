@@ -372,7 +372,7 @@ airplane_num
 airplane_num
 3
 50
-16
+21
 1
 1
 NIL
@@ -387,7 +387,7 @@ fuel_redundancy
 fuel_redundancy
 0
 100
-12
+5
 1
 1
 NIL
@@ -486,7 +486,7 @@ SWITCH
 117
 tactical
 tactical
-0
+1
 1
 -1000
 
