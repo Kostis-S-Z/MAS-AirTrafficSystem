@@ -169,11 +169,11 @@ to negotiate_dest
   let _min_dist 10000
   ask _possible_destinations [set _dest_list lput self _dest_list]
 
-  foreach _dest_list [
-    set _current_dist (distance ?)
+  foreach _dest_list [ ?1 ->
+    set _current_dist (distance ?1)
     if _current_dist < _min_dist [
       set _min_dist _current_dist
-      set _airport ?
+      set _airport ?1
     ]
   ]
 
@@ -205,11 +205,11 @@ to on_the_fly_dest
     let _dest_list []
     ask _possible_destinations [set _dest_list lput self _dest_list]
 
-    foreach _dest_list [
-      set _current_dist (distance ?)
+    foreach _dest_list [ ?1 ->
+      set _current_dist (distance ?1)
       if _current_dist < _min_dist [
         set _min_dist _current_dist
-        set _airport ?
+        set _airport ?1
       ]
     ]
     set dest _airport
@@ -273,10 +273,10 @@ end
 GRAPHICS-WINDOW
 761
 29
-1206
-495
-16
-16
+1204
+473
+-1
+-1
 13.2
 1
 10
@@ -340,7 +340,7 @@ airport_num
 airport_num
 2
 20
-8
+8.0
 1
 1
 NIL
@@ -372,7 +372,7 @@ airplane_num
 airplane_num
 3
 50
-21
+21.0
 1
 1
 NIL
@@ -387,7 +387,7 @@ fuel_redundancy
 fuel_redundancy
 0
 100
-5
+5.0
 1
 1
 NIL
@@ -831,9 +831,8 @@ false
 0
 Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
-
 @#$#@#$#@
-NetLogo 5.3.1
+NetLogo 6.0.1
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
@@ -849,7 +848,6 @@ true
 0
 Line -7500403 true 150 150 90 180
 Line -7500403 true 150 150 210 180
-
 @#$#@#$#@
 0
 @#$#@#$#@
